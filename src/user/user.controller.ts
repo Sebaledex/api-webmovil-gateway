@@ -38,5 +38,10 @@ export class UserController {
     delete(@Param('id') id: string): Observable<any> {
       return this._clientProxyUser.send(UserMSG.DELETE, id);
     }
+    @Post('admin')
+    createAdmin(@Body() userDTO: UserDTO): Observable<IUser> {
+      const adminDTO = { ...userDTO, roles: ['admin'] };
+      return this._clientProxyUser.send(UserMSG.CREATE, adminDTO);
+    }
   }
   
