@@ -11,6 +11,7 @@ export enum UserMSG {
   UPDATE = 'UPDATE_USER',
   DELETE = 'DELETE_USER',
   VALID_USER = 'VALID_USER',
+  PATCH = "PATCH_USER",
 }
 
 export enum RegisterMSG {

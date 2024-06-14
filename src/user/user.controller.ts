@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, UseGuards } from '@nestjs/common';
 import { ClientProxyWebMovil } from 'src/common/proxy/client-proxy';
 import { UserDTO } from './dto/user.dto';
 import { IUser } from 'src/common/interfaces/user.interface';
@@ -38,6 +38,12 @@ export class UserController {
     delete(@Param('id') id: string): Observable<any> {
       return this._clientProxyUser.send(UserMSG.DELETE, id);
     }
+    @Patch(':id')
+    patch(@Param('id') id: string, @Body() partialUserDTO: Partial<UserDTO>): Observable<IUser> {
+      console.log('patch', id, partialUserDTO);
+      return this._clientProxyUser.send(UserMSG.PATCH, { id, partialUserDTO });
+    }
+    
     @Post('admin')
     createAdmin(@Body() userDTO: UserDTO): Observable<IUser> {
       const adminDTO = { ...userDTO, roles: ['admin'] };
