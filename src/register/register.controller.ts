@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, Put, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpException, HttpStatus, Param, Patch, Post, Put, Query, UseGuards } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 import { ClientProxyWebMovil } from "src/common/proxy/client-proxy";
@@ -23,27 +23,46 @@ export class RegisterController {
     return this._clientProxyRegister.send(RegisterMSG.CREATE, registerDTO);
   }
 
-  // @Get()
-  // findAll(): Observable<IRegister[]> {
-  //   return this._clientProxyRegister.send(RegisterMSG.FIND_ALL, '');
-  // }
-
   @Get()
-async findAll(): Promise<any> { // Cambié Observable<IRegister[]> a Promise<any> para manejar datos anidados
-  const registers = await this._clientProxyRegister.send(RegisterMSG.FIND_ALL, '').toPromise();
+  findAll(): Observable<IRegister[]> {
+  return this._clientProxyRegister.send(RegisterMSG.FIND_ALL, '');
+  }
 
-  const detailedRegisters = await Promise.all(registers.map(async (register) => {
-    const detailedUsers = await Promise.all(register.users.map(async (userId) => {
-      return await this._clientProxyUser.send(UserMSG.FIND_ONE, userId).toPromise();
-    }));
-    return {
-      ...register,
-      users: detailedUsers
-    };
-  }));
+  @Get('Schedule/:start/:end')
+  findSchedule(
+    @Param('start') start: string,
+    @Param('end') end: string,
+  ): Observable<IRegister[]> {
+    try {
+      // Verificar si los parámetros start y end son válidos
+      if (!start || !end) {
+        throw new HttpException('Los parámetros start y end son obligatorios', HttpStatus.BAD_REQUEST);
+      }
 
-  return detailedRegisters;
-}
+      return this._clientProxyRegister.send<IRegister[]>(RegisterMSG.FIND_SCHEDULE, { start, end });
+    } catch (error) {
+      throw new HttpException('Error al buscar horarios', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @Get('ScheduleById/:start/:end/:id')
+  findScheduleById(
+    @Param('start') start: string,
+    @Param('end') end: string,
+    @Param('id') id: string,
+  ): Observable<IRegister[]> {
+    try {
+      // Verificar si los parámetros start y end son válidos
+      if (!start || !end) {
+        throw new HttpException('Los parámetros start y end son obligatorios', HttpStatus.BAD_REQUEST);
+      }
+
+      return this._clientProxyRegister.send<IRegister[]>(RegisterMSG.FIND_SCHEDULE_ID, { start, end, id });
+    } catch (error) {
+      throw new HttpException('Error al buscar horarios', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
 
 
   @Get(':id')
@@ -59,25 +78,32 @@ async findAll(): Promise<any> { // Cambié Observable<IRegister[]> a Promise<any
     return this._clientProxyRegister.send(RegisterMSG.UPDATE, { id, registerDTO });
   }
 
-  // @Post(':registerId/user/:userId')
-  // async addUser(
-  //   @Param('registerId') registerId: string,
-  //   @Param('userId') userId: string,
-  // ) {
-  //   const user = await this._clientProxyUser
-  //     .send(UserMSG.FIND_ONE, userId)
-  //     .toPromise();
+  @Patch(':id/checkOut')
+  setCheckOut(
+    @Param('id') id: string,
+    @Body() updateRegisterDto: RegisterDTO,
+  ): Observable<IRegister> {
+    console.log(`Received check-out request for register ${id} with body:`, updateRegisterDto)
+    return this._clientProxyRegister.send(RegisterMSG.UPDATE_PARTIAL,{ id, updateRegisterDto});
+  }
 
-  //   if (!user) {
-  //     throw new HttpException('User Not Found', HttpStatus.NOT_FOUND);
-  //   }
+  @Patch(':id/checkIn')
+  setCheckIn(
+    @Param('id') id: string,
+    @Body() updateRegisterDto: RegisterDTO,
+  ): Observable<IRegister> {
+    console.log(`Received check-out request for register ${id} with body:`, updateRegisterDto)
+    return this._clientProxyRegister.send(RegisterMSG.UPDATE_PARTIAL,{ id, updateRegisterDto});
+  }
 
-  //   return this._clientProxyRegister.send(RegisterMSG.ADD_USER, {
-  //     registerId,
-  //     userId,
-  //   });
-  // }
-
+  @Patch(':id/editAttendance')
+  editAttendance(
+    @Param('id') id: string,
+    @Body() updateRegisterDto: RegisterDTO,
+  ): Observable<IRegister> {
+    console.log(`Received edit attendance request for register ${id} with body:`, updateRegisterDto)
+    return this._clientProxyRegister.send(RegisterMSG.UPDATE_PARTIAL,{ id, updateRegisterDto});
+  }
 
   @Post(':registerId/user/:userId')
   async addUser(

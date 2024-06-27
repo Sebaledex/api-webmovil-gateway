@@ -1,22 +1,46 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, IsNumber, isDateString, IsDateString, IsBoolean } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { IUser } from 'src/common/interfaces/user.interface';
+
 export class RegisterDTO {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  name: string;
+  readonly name: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  city: string;
+  readonly city: string;
 
-  //@ApiProperty()
-  //@IsNotEmpty()
-  //@IsString()
-  //registerDate: Date;
-  //@ApiProperty()// Cambiado a tipo objecto
-  //@IsOptional()
-  //users?: string;  // Cambiado a IUser
+  @ApiProperty()
+  @IsNotEmpty()
+  readonly checkIn: Date;
+
+  @ApiProperty()
+  @IsDateString()
+  readonly checkOut: Date;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  readonly userId: string;
+
+  @IsNotEmpty()
+  readonly coordinates: {
+    latitude: Number;
+    longitude: Number;
+  };
+
+  @ApiProperty()
+  readonly coordinatesOut: {
+    latitude: Number;
+    longitude: Number;
+  };
+  
+  @ApiProperty()
+  @IsBoolean()
+  readonly edited:Boolean;
+
+  @ApiProperty()
+  @IsString()
+  readonly editedBy: string;
 }
