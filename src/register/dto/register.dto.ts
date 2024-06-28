@@ -43,4 +43,8 @@ export class RegisterDTO {
   @ApiProperty()
   @IsString()
   readonly editedBy: string;
+
+  @ApiProperty()
+  @IsNumber()
+  readonly workedHours: Number;
 }
