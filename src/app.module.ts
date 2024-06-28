@@ -9,8 +9,7 @@ import { RegisterModule } from './register/register.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      //Se usa para importar el archivo variables de entorno
-      envFilePath: ['.env.development'],
+      envFilePath: ['.env.local', '.env.development'],
       isGlobal: true,
     }),
     UserModule,

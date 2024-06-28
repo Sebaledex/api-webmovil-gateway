@@ -49,5 +49,11 @@ export class UserController {
       const adminDTO = { ...userDTO, roles: ['admin'] };
       return this._clientProxyUser.send(UserMSG.CREATE, adminDTO);
     }
+
+    @Patch(':id/role')
+    changeRole(@Param('id') id: string, @Body() changeRoleDTO: { isAdmin: boolean }): Observable<IUser> {
+      return this._clientProxyUser.send(UserMSG.CHANGE_ROLE, { id, isAdmin: changeRoleDTO.isAdmin });
+    }
+    
   }
   
